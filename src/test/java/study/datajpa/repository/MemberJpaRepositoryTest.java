@@ -1,6 +1,5 @@
 package study.datajpa.repository;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,10 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.Member;
 import study.datajpa.domain.Team;
 
-import javax.persistence.EntityManager;
-
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -20,7 +16,7 @@ class MemberJpaRepositoryTest {
     @Autowired
     private MemberJpaRepository memberJpaRepository;
     @Autowired
-    private TeamRepository teamRepository;
+    private TeamJpaRepository teamRepository;
 
     @Test
     public void basicCRUD() {
@@ -30,7 +26,7 @@ class MemberJpaRepositoryTest {
         teamRepository.save(team2);
 
         Member member1 = Member.createMember("memberA", 24, team1);
-        Member member2 = Member.createMember("memberA", 24, team1);
+        Member member2 = Member.createMember("memberB", 27, team1);
         Member save1 = memberJpaRepository.save(member1);
         Member save2 = memberJpaRepository.save(member2);
 
