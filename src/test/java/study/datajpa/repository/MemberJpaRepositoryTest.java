@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.Member;
 import study.datajpa.domain.Team;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
@@ -15,6 +17,8 @@ class MemberJpaRepositoryTest {
 
     @Autowired
     private MemberJpaRepository memberJpaRepository;
+    @Autowired
+    private MemberRepository memberRepository;
     @Autowired
     private TeamJpaRepository teamRepository;
 
@@ -36,5 +40,23 @@ class MemberJpaRepositoryTest {
         long count = memberJpaRepository.count();
 
         assertThat(2).isEqualTo(count);
+    }
+
+    @Test
+    void findByUserNameAndAgeGreaterThan() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member member1 = Member.createMember("memberA", 24, team1);
+        Member member2 = Member.createMember("memberB", 27, team1);
+        Member save1 = memberJpaRepository.save(member1);
+        Member save2 = memberJpaRepository.save(member2);
+
+        List<Member> memberA = memberRepository.findByUsernameAndAgeGreaterThanEqual("memberA", 20);
+        for (Member member : memberA) {
+            System.out.println("member = " + member);
+        }
     }
 }
