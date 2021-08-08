@@ -17,13 +17,13 @@ class MemberJpaRepositoryTest {
     @Autowired
     private MemberJpaRepository memberJpaRepository;
 
-    @Test
-    void 회원_저장() {
-        Member member = new Member("김상운");
-
-        Long memberId = memberJpaRepository.save(member);
-
-        assertThat(member).isEqualTo(memberJpaRepository.findOne(memberId));
-        assertThat(member.getUsername()).isEqualTo(memberJpaRepository.findOne(memberId).getUsername());
-    }
+//    @Test
+//    void 회원_저장() {
+//        Member member = Member.createMember("김상운");
+//
+//        Long memberId = memberJpaRepository.save(member);
+//
+//        assertThat(member).isEqualTo(memberJpaRepository.findOne(memberId));
+//        assertThat(member.getUsername()).isEqualTo(memberJpaRepository.findOne(memberId).getUsername());
+//    }
 }

@@ -16,15 +16,15 @@ import java.util.List;
 public class MemberRepositoryTest {
     @Autowired private MemberRepository memberRepository;
 
-    @Test
-    void 회원_저장() {
-        Member member = new Member("김상운");
-        Member saveMember = memberRepository.save(member);
-
-        Member findMember = memberRepository.findById(member.getId()).orElse(null);
-        List<Member> all = memberRepository.findAll();
-
-        //인터페이스인데 어떻게 동작하지..?
-        Assertions.assertThat(member).isEqualTo(findMember);
-    }
+//    @Test
+//    void 회원_저장() {
+//        Member member = Member.createMember("김상운");
+//        Member saveMember = memberRepository.save(member);
+//
+//        Member findMember = memberRepository.findById(member.getId()).orElse(null);
+//        List<Member> all = memberRepository.findAll();
+//
+//        //인터페이스인데 어떻게 동작하지..?
+//        Assertions.assertThat(member).isEqualTo(findMember);
+//    }
 }
