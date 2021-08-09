@@ -247,4 +247,57 @@ public class MemberRepositoryTest {
             System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
         }
     }
+
+    @Test
+    void readOnly() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member save1 = memberRepository.save(Member.createMember("member1", 18, team1));
+        Member save2 = memberRepository.save(Member.createMember("member2", 19, team2));
+
+        em.flush();
+        em.clear();
+
+        Member findMember = memberRepository.findById(save1.getId()).orElse(null);
+        findMember.setUsername("김상운");
+
+        em.flush();
+    }
+
+    @Test
+    void queryHint() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member save1 = memberRepository.save(Member.createMember("member1", 18, team1));
+        Member save2 = memberRepository.save(Member.createMember("member2", 19, team2));
+
+        em.flush();
+        em.clear();
+
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        findMember.setUsername("김상운");
+        em.flush();
+    }
+    @Test
+    void lock() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member save1 = memberRepository.save(Member.createMember("member1", 18, team1));
+        Member save2 = memberRepository.save(Member.createMember("member2", 19, team2));
+
+        em.flush();
+        em.clear();
+
+        List<Member> findMember = memberRepository.findLockByUsername("member1");
+
+    }
 }
