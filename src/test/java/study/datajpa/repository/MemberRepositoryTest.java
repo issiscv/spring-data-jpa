@@ -29,11 +29,15 @@ public class MemberRepositoryTest {
         Member save1 = memberRepository.save(member1);
         Member save2 = memberRepository.save(member2);
 
+        Member findMember = memberRepository.findByUsername("memberA").get(0);
+
         assertThat(member1).isEqualTo(memberRepository.findById(save1.getId()).get());
         assertThat(member2).isEqualTo(memberRepository.findById(save2.getId()).get());
+        assertThat(findMember).isEqualTo(member1);
 
         long count = memberRepository.count();
 
         assertThat(2).isEqualTo(count);
     }
+
 }
