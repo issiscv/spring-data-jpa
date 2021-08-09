@@ -3,6 +3,10 @@ package study.datajpa.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.Member;
@@ -22,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MemberRepositoryTest {
     @Autowired private MemberRepository memberRepository;
     @Autowired private TeamJpaRepository teamJpaRepository;
+    @Autowired private TeamRepository teamRepository;
     @Autowired private MemberJpaRepository memberJpaRepository;
 
     @Autowired private EntityManager em;
@@ -158,5 +163,88 @@ public class MemberRepositoryTest {
         //단건 조회 시 데이터가 없으면, 순수 jpa에서는 NPE, spring data jpa 는 null 반환
         //-> optional로 해결
         memberRepository.findListByUsername("memberA");
+    }
+
+    @Test
+    void paging() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member save1 = memberRepository.save(Member.createMember("member1", 24, team1));
+        Member save2 = memberRepository.save(Member.createMember("member2", 24, team1));
+        Member save3 = memberRepository.save(Member.createMember("member3", 24, team1));
+        Member save4 = memberRepository.save(Member.createMember("member4", 24, team1));
+        Member save5 = memberRepository.save(Member.createMember("member5", 24, team1));
+
+        int age = 24;
+
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        Page<Member> page = memberRepository.findPageByAge(age, pageRequest);
+
+        Page<MemberDto> map = page.map(m -> new MemberDto(m.getId(), m.getUsername(), m.getTeam().getName()));
+
+        List<Member> content = page.getContent();
+
+
+        //컨텐트의 사이즈
+        assertThat(content.size()).isEqualTo(3);
+        //모든 데이터의 수
+        assertThat(page.getTotalElements()).isEqualTo(5);
+        //현재 페이지의 수
+        assertThat(page.getNumber()).isEqualTo(0);
+        //페이지의 개수
+        assertThat(page.getTotalPages()).isEqualTo(2);
+
+        assertThat(page.isFirst()).isEqualTo(true);
+        assertThat(page.hasNext()).isEqualTo(true);
+    }
+
+    @Test
+    void bulkUpdate() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member save1 = memberRepository.save(Member.createMember("member1", 18, team1));
+        Member save2 = memberRepository.save(Member.createMember("member2", 19, team1));
+        Member save3 = memberRepository.save(Member.createMember("member3", 22, team1));
+        Member save4 = memberRepository.save(Member.createMember("member4", 23, team1));
+        Member save5 = memberRepository.save(Member.createMember("member5", 24, team1));
+        
+        //벌크 연산은 영속성 컨텍스트를 무시하고 DB에 접근한다.
+        //벌크연산을 수행해도 영속성 컨텍스트의 1차 캐쉬에는 아직 업데이트가 안됨
+        //jpql은 쿼리 먼저 보내고 jpql 실행
+        int i = memberRepository.bulkAgePlus(20);
+
+        Member member = memberRepository.findByUsername("member5").get(0);
+        System.out.println("member.getAge() = " + member.getAge());
+
+        assertThat(i).isEqualTo(3);
+    }
+
+    @Test
+    void findMemberLazy() {
+
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member save1 = memberRepository.save(Member.createMember("member1", 18, team1));
+        Member save2 = memberRepository.save(Member.createMember("member2", 19, team2));
+
+        em.flush();
+        em.clear();
+
+        List<Member> memberFetchJoin = memberRepository.findMember2ByUsername("member1");
+
+        for (Member member : memberFetchJoin) {
+            System.out.println("member.getUsername() = " + member.getUsername());
+            System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
+        }
     }
 }

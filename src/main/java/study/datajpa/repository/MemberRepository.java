@@ -1,6 +1,10 @@
 package study.datajpa.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.domain.Member;
@@ -39,4 +43,30 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findListByUsername(String username);//컬렉션
     Member findMemberByUsername(String username);//단건
     Optional<Member> findOptionalByUsername(String username);//단건 Optional
+    
+    //성능이 복잡해지면 count 쿼리를 만들자
+    Page<Member> findPageByAge(int age, Pageable pageable);
+    
+    //벌크 연산
+    @Modifying(clearAutomatically = true)
+    @Query("update Member m set m.age = m.age + 1 where m.age >= :age")
+    int bulkAgePlus(@Param("age") int age);
+    
+    //페치조인
+    @Query("select m from Member m join fetch m.team")
+    List<Member> findMemberFetchJoin();
+    
+    //JPQL 안짜고도 가능 오버라이딩해서 사용
+    @Override
+    @EntityGraph(attributePaths ={"team"})
+    List<Member> findAll();
+    
+    //JPQL에 엔티티그래프 추가
+    @EntityGraph(attributePaths = {"team"})
+    @Query("select m from Member m")
+    List<Member> findMemberEntityGraph();
+
+    //쿼리 메서드에 엔티티 그래프 추가
+    @EntityGraph(attributePaths = {"team"})
+    List<Member> findMember2ByUsername(String username);
 }

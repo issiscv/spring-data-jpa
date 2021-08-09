@@ -83,4 +83,22 @@ class MemberJpaRepositoryTest {
         assertThat(members.size()).isEqualTo(3);
         assertThat(total).isEqualTo(5);
     }
+
+    @Test
+    void bulkUpdate() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member save1 = memberJpaRepository.save(Member.createMember("member1", 18, team1));
+        Member save2 = memberJpaRepository.save(Member.createMember("member2", 19, team1));
+        Member save3 = memberJpaRepository.save(Member.createMember("member3", 22, team1));
+        Member save4 = memberJpaRepository.save(Member.createMember("member4", 23, team1));
+        Member save5 = memberJpaRepository.save(Member.createMember("member5", 24, team1));
+
+        int i = memberJpaRepository.bulkAgePlus(20);
+
+        assertThat(i).isEqualTo(3);
+    }
 }

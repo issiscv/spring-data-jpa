@@ -8,23 +8,33 @@ import study.datajpa.domain.Member;
 import study.datajpa.domain.Team;
 import study.datajpa.repository.MemberJpaRepository;
 import study.datajpa.repository.MemberRepository;
+import study.datajpa.repository.TeamRepository;
+import study.datajpa.service.MemberService;
+import study.datajpa.service.TeamService;
 
 @RestController
 @RequiredArgsConstructor
 public class HelloController {
 
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
+    private final TeamService teamService;
 
-    @Transactional
     @GetMapping("/hello")
     public String hello() {
         Team team = Team.createTeam("1팀");
+
         Member member = Member.createMember("김상운", 24, team);
 
+        Long teamId = teamService.join(team);
+        Long memberId = memberService.join(member);
 
-        memberRepository.save(member);
-        Member one = memberRepository.findById(member.getId()).orElse(null);
+        Member findMember = memberService.findMember(memberId);
+        Team findTeam = teamService.findTeam(teamId);
 
-        return one.getUsername();
+        if (findMember.getTeam()==findTeam) {
+            return "true";
+        }
+
+        return "false";
     }
 }
