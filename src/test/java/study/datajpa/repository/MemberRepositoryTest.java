@@ -10,7 +10,9 @@ import study.datajpa.domain.Team;
 import study.datajpa.dto.MemberDto;
 
 import javax.persistence.EntityManager;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MemberRepositoryTest {
     @Autowired private MemberRepository memberRepository;
     @Autowired private TeamJpaRepository teamJpaRepository;
+    @Autowired private MemberJpaRepository memberJpaRepository;
+
     @Autowired private EntityManager em;
     @Test
     public void basicCRUD() {
@@ -118,5 +122,41 @@ public class MemberRepositoryTest {
         for (Member member : members) {
             System.out.println(member.getTeam().getName());
         }
+    }
+
+    @Test
+    void findByNames() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamJpaRepository.save(team1);
+        teamJpaRepository.save(team2);
+
+        Member member1 = Member.createMember("memberA", 24, team1);
+        Member member2 = Member.createMember("memberB", 24, team2);
+        Member save1 = memberRepository.save(member1);
+        Member save2 = memberRepository.save(member2);
+
+        List<Member> findMembers = memberRepository.findByNames(Arrays.asList("memberA", "memberB"));
+
+        for (Member findMember : findMembers) {
+            System.out.println("findMember = " + findMember);
+        }
+    }
+
+    @Test
+    void returnType() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamJpaRepository.save(team1);
+        teamJpaRepository.save(team2);
+
+        Member member1 = Member.createMember("memberA", 24, team1);
+        Member member2 = Member.createMember("memberB", 24, team2);
+        Member save1 = memberRepository.save(member1);
+        Member save2 = memberRepository.save(member2);
+
+        //단건 조회 시 데이터가 없으면, 순수 jpa에서는 NPE, spring data jpa 는 null 반환
+        //-> optional로 해결
+        memberRepository.findListByUsername("memberA");
     }
 }
