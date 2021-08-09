@@ -59,4 +59,28 @@ class MemberJpaRepositoryTest {
             System.out.println("member = " + member);
         }
     }
+
+    @Test
+    void paging() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member save1 = memberJpaRepository.save(Member.createMember("member1", 24, team1));
+        Member save2 = memberJpaRepository.save(Member.createMember("member2", 24, team1));
+        Member save3 = memberJpaRepository.save(Member.createMember("member3", 24, team1));
+        Member save4 = memberJpaRepository.save(Member.createMember("member4", 24, team1));
+        Member save5 = memberJpaRepository.save(Member.createMember("member5", 24, team1));
+
+        int age = 24;
+        int offset = 1;
+        int limit = 3;
+
+        List<Member> members = memberJpaRepository.findByPage(age, offset, limit);
+        long total = memberJpaRepository.totalCount(age);
+
+        assertThat(members.size()).isEqualTo(3);
+        assertThat(total).isEqualTo(5);
+    }
 }
