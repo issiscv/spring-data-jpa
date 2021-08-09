@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.Member;
 import study.datajpa.domain.Team;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -40,4 +42,20 @@ public class MemberRepositoryTest {
         assertThat(2).isEqualTo(count);
     }
 
+    @Test
+    void testQuery() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamJpaRepository.save(team1);
+        teamJpaRepository.save(team2);
+
+        Member member1 = Member.createMember("memberA", 24, team1);
+        Member member2 = Member.createMember("memberA", 24, team1);
+        Member save1 = memberRepository.save(member1);
+        Member save2 = memberRepository.save(member2);
+
+        List<Member> memberA = memberRepository.findUser("memberA", 24);
+
+        assertThat(memberA.get(0)).isEqualTo(member1);
+    }
 }
