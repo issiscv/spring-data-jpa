@@ -7,7 +7,9 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.Member;
 import study.datajpa.domain.Team;
+import study.datajpa.dto.MemberDto;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MemberRepositoryTest {
     @Autowired private MemberRepository memberRepository;
     @Autowired private TeamJpaRepository teamJpaRepository;
-
+    @Autowired private EntityManager em;
     @Test
     public void basicCRUD() {
         Team team1 = Team.createTeam("teamA");
@@ -57,5 +59,64 @@ public class MemberRepositoryTest {
         List<Member> memberA = memberRepository.findUser("memberA", 24);
 
         assertThat(memberA.get(0)).isEqualTo(member1);
+    }
+    @Test
+    void findUsernameList() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamJpaRepository.save(team1);
+        teamJpaRepository.save(team2);
+
+        Member member1 = Member.createMember("memberA", 24, team1);
+        Member member2 = Member.createMember("memberB", 24, team1);
+        Member save1 = memberRepository.save(member1);
+        Member save2 = memberRepository.save(member2);
+
+        List<String> usernameList = memberRepository.findUsernameList();
+        for (String s : usernameList) {
+            System.out.println("s = " + s);
+        }
+    }
+
+    @Test
+    void findMemberDto() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamJpaRepository.save(team1);
+        teamJpaRepository.save(team2);
+
+        Member member1 = Member.createMember("memberA", 24, team1);
+        Member member2 = Member.createMember("memberB", 24, team1);
+        Member save1 = memberRepository.save(member1);
+        Member save2 = memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        List<MemberDto> memberDto = memberRepository.findMemberDto();
+        for (MemberDto dto : memberDto) {
+            System.out.println(dto.getId() + " " + dto.getUsername() + " " + dto.getTeamName());
+        }
+    }
+
+    @Test
+    void findMember() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamJpaRepository.save(team1);
+        teamJpaRepository.save(team2);
+
+        Member member1 = Member.createMember("memberA", 24, team1);
+        Member member2 = Member.createMember("memberB", 24, team2);
+        Member save1 = memberRepository.save(member1);
+        Member save2 = memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        List<Member> members = memberRepository.findMember();
+        for (Member member : members) {
+            System.out.println(member.getTeam().getName());
+        }
     }
 }
