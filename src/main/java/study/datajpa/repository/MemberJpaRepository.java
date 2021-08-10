@@ -21,9 +21,17 @@ public class MemberJpaRepository {
     }
 
     //단건 조회
+    public Member findOneJpql(Long id) {
+        return em.createQuery("select m from Member m where m.id = :id", Member.class)
+                .setParameter("id", id)
+                .getSingleResult();
+    }
+    
+    //단건 조회
     public Member findOne(Long id) {
         return em.find(Member.class, id);
     }
+
 
     //삭제
     public void delete(Member member) {

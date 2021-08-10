@@ -184,10 +184,11 @@ public class MemberRepositoryTest {
 
         Page<Member> page = memberRepository.findPageByAge(age, pageRequest);
 
-        Page<MemberDto> map = page.map(m -> new MemberDto(m.getId(), m.getUsername(), m.getTeam().getName()));
-
         List<Member> content = page.getContent();
 
+        for (Member member : content) {
+            System.out.println("member = " + member);
+        }
 
         //컨텐트의 사이즈
         assertThat(content.size()).isEqualTo(3);
@@ -300,4 +301,20 @@ public class MemberRepositoryTest {
         List<Member> findMember = memberRepository.findLockByUsername("member1");
 
     }
+
+    @Test
+    void callCustom() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member save1 = memberRepository.save(Member.createMember("member1", 18, team1));
+        Member save2 = memberRepository.save(Member.createMember("member2", 19, team2));
+
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+
+
+    }
+
 }

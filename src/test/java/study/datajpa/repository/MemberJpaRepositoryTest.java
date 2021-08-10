@@ -3,6 +3,7 @@ package study.datajpa.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.Member;
 import study.datajpa.domain.Team;
@@ -13,6 +14,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@Rollback(value = false)
 class MemberJpaRepositoryTest {
 
     @Autowired
@@ -100,5 +102,19 @@ class MemberJpaRepositoryTest {
         int i = memberJpaRepository.bulkAgePlus(20);
 
         assertThat(i).isEqualTo(3);
+    }
+    @Test
+    void jpqlTest() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member save1 = memberJpaRepository.save(Member.createMember("member1", 18, team1));
+        Member save2 = memberJpaRepository.save(Member.createMember("member2", 19, team2));
+
+        System.out.println("///////////////////////////////");
+        memberJpaRepository.findOneJpql(save1.getId());
+        System.out.println("///////////////////////////////");
     }
 }
