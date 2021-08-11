@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.Member;
 import study.datajpa.domain.Team;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -23,6 +24,8 @@ class MemberJpaRepositoryTest {
     private MemberRepository memberRepository;
     @Autowired
     private TeamJpaRepository teamRepository;
+    @Autowired
+    private EntityManager em;
 
     @Test
     public void basicCRUD() {
@@ -116,5 +119,26 @@ class MemberJpaRepositoryTest {
         System.out.println("///////////////////////////////");
         memberJpaRepository.findOneJpql(save1.getId());
         System.out.println("///////////////////////////////");
+    }
+
+    @Test
+    void JpaBaseEntity() throws InterruptedException {
+        Team team1 = Team.createTeam("teamA");
+        teamRepository.save(team1);
+
+        Member member = Member.createMember("member1", 18, team1);
+        memberRepository.save(member);
+
+        Thread.sleep(1000);
+        member.setUsername("김상운");
+
+        Member findMember = memberRepository.findById(member.getId()).orElse(null);
+        em.flush();
+        em.clear();
+
+        System.out.println("findMember.getc = " + findMember.getCreatedDate());
+        System.out.println("findMember.getUpdateDate() = " + findMember.getLastModifiedDate());
+        System.out.println("findMember.getCreatedBy() = " + findMember.getCreatedBy());
+        System.out.println("findMember.getLastModifiedBy() = " + findMember.getLastModifiedBy());
     }
 }
