@@ -1,5 +1,6 @@
 package study.datajpa.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class Team extends BaseTimeEntity {
     private String name;
     
     //1 : 다
+    @JsonIgnore
     @OneToMany(mappedBy = "team")
     private List<Member> members = new ArrayList<>();
 

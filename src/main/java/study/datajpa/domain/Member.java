@@ -1,5 +1,6 @@
 package study.datajpa.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -8,10 +9,6 @@ import javax.persistence.*;
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "username", "age"})
-@NamedQuery(
-        name = "Member.findByUsername",
-        query = "select m from Member m where m.username =: username"
-)
 public class Member extends BaseTimeEntity {
 
     @Id @GeneratedValue
@@ -22,6 +19,7 @@ public class Member extends BaseTimeEntity {
     private int age;
 
     //다 : 1
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
