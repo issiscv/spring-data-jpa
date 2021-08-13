@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +15,6 @@ import study.datajpa.dto.MemberDto;
 import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -318,5 +316,22 @@ public class MemberRepositoryTest {
     }
 
 
+    @Test
+    void projections() {
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member save1 = memberRepository.save(Member.createMember("member1", 18, team1));
+        Member save2 = memberRepository.save(Member.createMember("member2", 19, team2));
+
+        List<UsernameOnly> member1 = memberRepository.findProByUsername("member1");
+
+        for (UsernameOnly usernameOnly : member1) {
+            System.out.println("usernameOnly = " + usernameOnly.getUsername());
+        }
+
+    }
 
 }

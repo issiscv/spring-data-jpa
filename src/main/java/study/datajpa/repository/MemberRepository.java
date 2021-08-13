@@ -17,7 +17,11 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     //동적 쿼리
     List<Member> findByUsernameAndAgeGreaterThanEqual(String username, int age);
-    
+
+    List<UsernameOnly> findProjectionByUsernameAndAgeGreaterThanEqual(String username, int age);
+
+    List<UsernameOnly> findProByUsername(String username);
+
     //named 쿼리
     @Query(name = "Member.findByUsername")
     List<Member> findByUsername(@Param("username") String username);

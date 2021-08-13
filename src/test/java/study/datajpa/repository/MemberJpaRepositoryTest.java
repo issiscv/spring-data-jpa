@@ -138,7 +138,5 @@ class MemberJpaRepositoryTest {
 
         System.out.println("findMember.getc = " + findMember.getCreatedDate());
         System.out.println("findMember.getUpdateDate() = " + findMember.getLastModifiedDate());
-        System.out.println("findMember.getCreatedBy() = " + findMember.getCreatedBy());
-        System.out.println("findMember.getLastModifiedBy() = " + findMember.getLastModifiedBy());
     }
 }
