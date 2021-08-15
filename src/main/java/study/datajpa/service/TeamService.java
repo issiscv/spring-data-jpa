@@ -11,7 +11,7 @@ import study.datajpa.repository.TeamRepository;
 @RequiredArgsConstructor
 public class TeamService {
     private final TeamRepository teamRepository;
-
+    //tra
     @Transactional
     public Long join(Team team) {
         Team saveTeam = teamRepository.save(team);
