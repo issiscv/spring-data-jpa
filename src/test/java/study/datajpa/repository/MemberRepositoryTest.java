@@ -1,5 +1,6 @@
 package study.datajpa.repository;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,11 +17,11 @@ import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-@Rollback(false)
 public class MemberRepositoryTest {
     @Autowired private MemberRepository memberRepository;
     @Autowired private TeamJpaRepository teamJpaRepository;
@@ -332,6 +333,22 @@ public class MemberRepositoryTest {
             System.out.println("usernameOnly = " + usernameOnly.getUsername());
         }
 
+    }
+
+    @Test
+    void fkTest() {
+
+        Team team1 = Team.createTeam("teamA");
+        Team team2 = Team.createTeam("teamB");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member save1 = memberRepository.save(Member.createMember("member1", 18, team1));
+        Member save2 = memberRepository.save(Member.createMember("member2", 19, team2));
+
+        Member findMember = memberRepository.findByTeamId(team1.getId());
+
+        assertThat(findMember).isEqualTo(save1);
     }
 
 }
